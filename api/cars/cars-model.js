@@ -10,14 +10,13 @@ const getById = () => {
   return db('cars').where('id', id).first()
 }
 
-const create = () => {
-  // HOKUS POKUS
-  const insertedCar = db('cars')
-    .insert(cars)
+const create = (car) => {
+  const createdCar = db('cars')
+    .insert(car)
     .then((ids) => {
       return getById(ids[0])
     })
-  return insertedCar
+  return createdCar
 }
 
 const getByVin = (vin) => {

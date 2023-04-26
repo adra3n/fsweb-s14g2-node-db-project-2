@@ -10,6 +10,7 @@ const checkCarId = async (req, res, next) => {
         .status(404)
         .json({ message: `${req.params.id} kimliğine sahip araba bulunamadı` })
     } else {
+      req.existCar = existCar
       next()
     }
   } catch (error) {
@@ -19,16 +20,41 @@ const checkCarId = async (req, res, next) => {
 
 const checkCarPayload = (req, res, next) => {
   // HOKUS POKUS
-  const fields = ['vin', 'make', 'model', 'mileage']
-  let missedFields = []
-  fields.forEach((i) => {
-    const item = fields[i]
-    if (!req.body.item) {
-      missedFields.push(item)
+  try {
+    const fields = ['vin', 'make', 'model', 'mileage']
+    let missedFields = []
+    for (let i = 0; i < fields.length; i++) {
+      const item = fields[i]
+      if (!req.body[item]) {
+        missedFields.push(item)
+      }
     }
-  })
-  if (missedFields.length > 0) {
-    res.status(400).json({ message: 'Eksik Alan' })
+    for (let x = 0; x < missedFields.length; x++) {
+      switch (missedFields[x]) {
+        case 'vin':
+          res.status(400).json({
+            message: `vin is missing`,
+          })
+        case 'make':
+          res.status(400).json({
+            message: `make is missing`,
+          })
+        case 'model':
+          res.status(400).json({
+            message: `model is missing`,
+          })
+        case 'mileage':
+          res.status(400).json({
+            message: `mileage is missing`,
+          })
+
+        default:
+          next()
+          break
+      }
+    }
+  } catch (error) {
+    next(error)
   }
 }
 
@@ -37,7 +63,7 @@ const checkVinNumberValid = (req, res, next) => {
   try {
     let isVinValid = vinValidator.validate(req.body.vin)
     if (!isVinValid) {
-      res.status(400).json({ message: `vin ${req.body.vin} geçersizdir.` })
+      res.status(400).json({ message: `vin ${req.body.vin} is invalid.` })
     } else {
       next()
     }
@@ -51,7 +77,7 @@ const checkVinNumberUnique = async (req, res, next) => {
   try {
     const isRecordExist = await carsModel.getByVin(req.body.vin)
     if (isRecordExist) {
-      res.status(400).json({ message: `vin ${req.body.vin} zaten var.` })
+      res.status(400).json({ message: `vin ${req.body.vin} is invalid.` })
     }
   } catch (error) {
     next(error)

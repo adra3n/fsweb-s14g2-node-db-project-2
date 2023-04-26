@@ -12,7 +12,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', middleware.checkCarId, async (req, res, next) => {
+router.get('/:id', middleware.checkCarId, (req, res, next) => {
   try {
     res.json(req.existCar)
   } catch (error) {
@@ -28,7 +28,7 @@ router.post(
   async (req, res, next) => {
     try {
       const createdCar = await carsModel.create(req.body)
-      res.status(201).json(createdCar)
+      res.json(createdCar)
     } catch (error) {
       next(error)
     }
