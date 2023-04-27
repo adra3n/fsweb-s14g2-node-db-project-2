@@ -5,7 +5,7 @@ const getAll = () => {
   return db('cars')
 }
 
-const getById = () => {
+const getById = (id) => {
   // HOKUS POKUS+
   return db('cars').where('id', id).first()
 }

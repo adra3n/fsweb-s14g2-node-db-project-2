@@ -29,30 +29,39 @@ const checkCarPayload = (req, res, next) => {
         missedFields.push(item)
       }
     }
-    for (let x = 0; x < missedFields.length; x++) {
+    if (missedFields.length) {
+      res.status(400).json({ message: `${missedFields.toString()} is missing` })
+    } else {
+      next()
+    }
+
+    /*for (let x = 0; x < missedFields.length; x++) {
       switch (missedFields[x]) {
         case 'vin':
           res.status(400).json({
             message: `vin is missing`,
           })
+          break
         case 'make':
           res.status(400).json({
             message: `make is missing`,
           })
+          break
         case 'model':
           res.status(400).json({
             message: `model is missing`,
           })
+          break
         case 'mileage':
           res.status(400).json({
             message: `mileage is missing`,
           })
-
+          break
         default:
           next()
           break
       }
-    }
+    }*/
   } catch (error) {
     next(error)
   }
@@ -63,7 +72,7 @@ const checkVinNumberValid = (req, res, next) => {
   try {
     let isVinValid = vinValidator.validate(req.body.vin)
     if (!isVinValid) {
-      res.status(400).json({ message: `vin ${req.body.vin} is invalid.` })
+      res.status(400).json({ message: `vin ${req.body.vin} is invalid` })
     } else {
       next()
     }
@@ -77,7 +86,9 @@ const checkVinNumberUnique = async (req, res, next) => {
   try {
     const isRecordExist = await carsModel.getByVin(req.body.vin)
     if (isRecordExist) {
-      res.status(400).json({ message: `vin ${req.body.vin} is invalid.` })
+      res.status(400).json({ message: `vin ${req.body.vin} already exists` })
+    } else {
+      next()
     }
   } catch (error) {
     next(error)
